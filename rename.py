@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import os
+import string
 from pathlib import Path
 from mutagen.easyid3 import EasyID3
 from mutagen.id3 import ID3NoHeaderError
@@ -18,14 +19,15 @@ def rename_mp3_files(path: str):
             tags = EasyID3()  # file has no ID3 tag
 
         # Set the title to the filename without the extension
-        tags["title"] = file.stem
+        name_stripped = file.stem.strip(string.digits + string.punctuation + string.whitespace + "-")
+        tags["title"] = str(index).zfill(2) + " - " + name_stripped
 
         # Set the track number based on the order of the files in the folder
         tags["tracknumber"] = str(index)
         index += 1
 
         tags.save(file, v2_version=3)  # ID3v2.3 is the most widely compatible with phones
-        print(f"{file.name} -> Title: {tags['title'][0]}, Track Number: {tags.get('tracknumber', ['N/A'])[0]}")
+        print(f"{file.name:<40.40} -> Title: {tags['title'][0]:<40.40}")
 
     print("Renaming completed.")
 
